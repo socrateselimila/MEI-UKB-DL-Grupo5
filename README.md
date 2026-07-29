@@ -25,16 +25,23 @@ O objectivo principal deste projecto é desenvolver, treinar e avaliar modelos d
 
 ## 📂 Estrutura do Repositório
 ```text
-├── data/                  # Datasets brutos e processados (inputs, outputs)
-├── notebooks/             # Notebooks Jupyter de exploração, treino e validação
-│   ├── 01_data_prep.ipynb # Construção e limpeza de datasets
-│   ├── 02_numpy_models.ipynb # Modelos implementados de raiz (NumPy)
-│   └── 03_pytorch_models.ipynb # Modelos avançados em PyTorch
-├── models/                # Modelos treinados salvos (.pkl, .pt, .pth)
-├── src/                   # Módulos Python com rotinas reutilizáveis de código
-├── reports/               # Relatório final em PDF (máximo 10 páginas)
-├── submission_notebook.ipynb # Notebook oficial para inferência e avaliação
-└── README.md              # Apresentação geral do repositório
+├── README.md                          # Apresentação do grupo e navegação do projecto
+├── data/
+│   ├── raw/                           # Datasets originais (dataset1, HC3, etc.)
+│   └── processed/                     # Datasets limpos e prontos para treino
+├── src/                               # Módulos Python reutilizáveis (.py)
+│   ├── dataset_loader.py              # Script para processar e fundir dados
+│   ├── preprocessing.py               # Limpeza de texto e vetorização (TF-IDF/BoW)
+│   ├── custom_nn.py                   # Implementação Scratch em NumPy (Tarefa 2)
+│   └── pytorch_models.py              # Classes dos modelos PyTorch (Tarefa 3)
+├── notebooks/                         # Análise exploratória e treinos (.ipynb)
+│   ├── 01_eda_and_data_fusion.ipynb   # Exploração e junção dos datasets
+│   ├── 02_numpy_baseline.ipynb        # Treino/Validação dos modelos em NumPy
+│   ├── 03_pytorch_models.ipynb        # Treino das redes PyTorch (LSTM/Transformers)
+│   └── 04_submission_pipeline.ipynb   # Notebook final de inferência para o professor
+├── models/                            # Pesos dos modelos guardados (.pth, .pkl)
+└── report/
+    └── Relatorio_Final.pdf            # Relatório em PDF (máx. 10 páginas)
 ```
 
 ---
