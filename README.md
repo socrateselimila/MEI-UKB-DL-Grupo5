@@ -62,7 +62,7 @@ O objectivo principal deste projecto é desenvolver, treinar e avaliar modelos d
 ## 🗓️ Etapas de Desenvolvimento
 - [x] **Etapa 1:** Criação do repositório e estruturação inicial.
 - [x] **Etapa 2:** Recolha, limpeza e fusão dos datasets de treino (Tarefa 1).
-- [ ] **Etapa 3:** Implementação dos modelos de raiz em NumPy (Tarefa 2).
+- [x] **Etapa 3:** Implementação dos modelos de raiz em NumPy (Tarefa 2).
 - [ ] **Etapa 4:** Desenvolvimento e ajuste de hiperparâmetros dos modelos PyTorch (Tarefa 3).
 - [ ] **Etapa 5:** Preparação dos pipelines de teste e 1ª Submissão dos modelos (Tarefa 4).
 - [ ] **Etapa 6:** Redação do relatório final em PDF e preparação da defesa (Tarefa 5 & 6).
