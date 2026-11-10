@@ -10,7 +10,7 @@ Projecto Prático da UC de Aprendizagem Profunda (2026) - Detecção de Texto Ge
 
 ## 👥 Constituição do Grupo de Trabalho
 * **Alfredo Sócrates Elimila 1** — [alfredosocrateselimila@gmail.com / socrateselimila]
-* **Cardoso da Silva Monteiro 2** — [cardosomonteiro7@gmail.com / GitHub]
+* **Cardoso da Silva Monteiro 2** — [cardosomonteiro7@gmail.com / Cardoso-Monteiro]
 * **Eunice Patrícia de Freitas Barros 3** — [929532160.eunice@gmail.com / GitHub]
 * **Rita Tavita Carlos Elias  4** — [ritinhacarlos89@gmail.com / GitHub]
 
