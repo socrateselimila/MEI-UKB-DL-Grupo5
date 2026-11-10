@@ -40,6 +40,10 @@ O objectivo principal deste projecto é desenvolver, treinar e avaliar modelos d
 │   ├── 03_pytorch_models.ipynb        # Treino das redes PyTorch (LSTM/Transformers)
 │   └── 04_submission_pipeline.ipynb   # Notebook final de inferência para o professor
 ├── models/                            # Pesos dos modelos guardados (.pth, .pkl)
+├── Submissao1
+|   ├── gerar_submissao.py             # Script usado para gerar as submissões
+│   ├── submissao1-grupo5-s1.csv       # 1ª Previsão
+│   ├── submissao1-grupo5-s2.csv       # 2ª Previsão
 └── report/
     └── Relatorio_Final.pdf            # Relatório em PDF (máx. 10 páginas)
 ```
@@ -65,4 +69,4 @@ O objectivo principal deste projecto é desenvolver, treinar e avaliar modelos d
 - [x] **Etapa 3:** Implementação dos modelos de raiz em NumPy (Tarefa 2).
 - [x] **Etapa 4:** Desenvolvimento e ajuste de hiperparâmetros dos modelos PyTorch (Tarefa 3).
 - [x] **Etapa 5:** Preparação dos pipelines de teste e 1ª Submissão dos modelos (Tarefa 4).
-- [ ] **Etapa 6:** Redação do relatório final em PDF e preparação da defesa (Tarefa 5 & 6).
+- [x] **Etapa 6:** Redação do relatório final em PDF e preparação da defesa (Tarefa 5 & 6).
