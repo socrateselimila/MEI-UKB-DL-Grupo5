@@ -1,15 +1,39 @@
+import sys
+import os
+
+# Adiciona a pasta 'src' ao path do Python para encontrar custom_nn e pytorch_models
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+SRC_DIR = os.path.join(ROOT_DIR, 'src')
+
+if SRC_DIR not in sys.path:
+    sys.path.append(SRC_DIR)
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+import sys
+import os
+from collections import Counter
+import re
+import pickle
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-import re
-import pickle
-import os
-from collections import Counter
 
 # ==========================================
-# 0. CLASSE SIMPLETFIDTF (NECESSÁRIA PARA O PICKLE)
+# 0. CONFIGURAÇÃO DE CAMINHOS (IMPORTAR DA RAIZ)
 # ==========================================
+# Como o script está em Submissao1/, subimos um nível para encontrar a raiz do projeto
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(CURRENT_DIR)
+
+# Adicionar a raiz ao sys.path para importar os módulos custom_nn e pytorch_models
+sys.path.append(ROOT_DIR)
+
+from custom_nn import sigmoid, relu, DeepNeuralNetworkNumPy
+from pytorch_models import TextBiLSTM
+
+# Tokenizador e Vocabulário
 def tokenize(text):
     text = str(text).lower()
     return re.findall(r'\b[a-z]{2,}\b', text)
@@ -46,9 +70,6 @@ class SimpleTFIDF:
                     X[i, idx] = tf * self.idf_[token]
         return X
 
-# ==========================================
-# 1. ARQUITETURAS DOS MODELOS (PYTORCH E NUMPY)
-# ==========================================
 class Vocabulary:
     def __init__(self, w2i_dict, pad_token="<PAD>", unk_token="<UNK>"):
         self.w2i = w2i_dict
@@ -62,29 +83,6 @@ class Vocabulary:
             ids += [self.w2i.get(self.pad_token, 0)] * (max_len - len(ids))
         return ids
 
-class TextBiLSTM(nn.Module):
-    def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim=1, n_layers=2, dropout=0.3):
-        super().__init__()
-        self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
-        self.lstm = nn.LSTM(
-            embedding_dim, hidden_dim, num_layers=n_layers, 
-            bidirectional=True, dropout=dropout if n_layers > 1 else 0.0, batch_first=True
-        )
-        self.fc = nn.Linear(hidden_dim * 2, output_dim)
-        self.dropout = nn.Dropout(dropout)
-        
-    def forward(self, text):
-        embedded = self.dropout(self.embedding(text))
-        _, (hidden, _) = self.lstm(embedded)
-        hidden = self.dropout(torch.cat((hidden[-2,:,:], hidden[-1,:,:]), dim=1))
-        return self.fc(hidden)
-
-def sigmoid(z):
-    return 1 / (1 + np.exp(-np.clip(z, -500, 500)))
-
-def relu(z):
-    return np.maximum(0, z)
-
 def numpy_dnn_predict(X, params):
     cache_A = X.T
     L = len(params) // 2
@@ -96,25 +94,20 @@ def numpy_dnn_predict(X, params):
     return A_last.T
 
 # ==========================================
-# 2. CONFIGURAÇÃO DE CAMINHOS E GRUPO
+# 1. CAMINHOS DOS DADOS E MODELOS
 # ==========================================
 GRUPO_NUMERO = 5
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(BASE_DIR)
-
 INPUT_PATH = os.path.join(ROOT_DIR, 'data', 'dataset3_inputs.csv')
-OUTPUT_DIR = os.path.join(ROOT_DIR, 'Submissao1')
+OUTPUT_DIR = CURRENT_DIR  # Guarda os ficheiros na própria pasta Submissao1/
 MODEL_NUMPY_PATH = os.path.join(ROOT_DIR, 'models', 'numpy_dnn.pkl')
 MODEL_PYTORCH_PATH = os.path.join(ROOT_DIR, 'models', 'pytorch_bilstm.pth')
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 print(f"Dispositivo de execução: {device.type}")
 
 # ==========================================
-# 3. CARREGAR MODELOS
+# 2. CARREGAR MODELOS
 # ==========================================
 print("A carregar os modelos guardados...")
 with open(MODEL_NUMPY_PATH, 'rb') as f:
@@ -134,7 +127,7 @@ pytorch_model.eval()
 print("Modelos carregados com sucesso!")
 
 # ==========================================
-# 4. LER O DATASET COM SEPARADOR CORRETO (;)
+# 3. LER O DATASET E EXECUTAR INFERÊNCIA
 # ==========================================
 print(f"A ler o dataset de input de: {INPUT_PATH}")
 df_test = pd.read_csv(INPUT_PATH, sep=';', engine='python', on_bad_lines='skip')
@@ -143,26 +136,21 @@ num_exemplos = len(df_test)
 print(f"Total de exemplos lidos com sucesso: {num_exemplos}")
 print(f"Total de exemplos a classificar: {num_exemplos}")
 
-# Identificar qual é a coluna de texto ('Text' ou índice 1)
 text_col = 'Text' if 'Text' in df_test.columns else df_test.columns[1]
 texts = df_test[text_col].astype(str).values
 
-# ==========================================
-# 5. INFERÊNCIA E GRAVAÇÃO DOS FICHEIROS
-# ==========================================
+# Modelo 1: NumPy DNN
 print("A executar inferência com o Modelo 1 (NumPy DNN)...")
 X_test_np = vectorizer_numpy.transform(texts)
 probs_np = numpy_dnn_predict(X_test_np, numpy_params).flatten()
 preds_np_labels = ["AI" if p >= 0.5 else "Human" for p in probs_np]
 
-df_sub1 = pd.DataFrame({
-    'text': texts,
-    'output': preds_np_labels
-})
+df_sub1 = pd.DataFrame({'text': texts, 'output': preds_np_labels})
 path_sub1 = os.path.join(OUTPUT_DIR, f"submissao1-grupo{GRUPO_NUMERO}-s1.csv")
 df_sub1.to_csv(path_sub1, index=False)
 print(f"Guardado com sucesso: {path_sub1}")
 
+# Modelo 2: PyTorch Bi-LSTM
 print("A executar inferência com o Modelo 2 (PyTorch Bi-LSTM)...")
 encoded_texts = [vocab_pytorch.encode(t, max_len=checkpoint['max_len']) for t in texts]
 tensor_x = torch.tensor(encoded_texts, dtype=torch.long).to(device)
@@ -173,10 +161,7 @@ with torch.no_grad():
 
 preds_torch_labels = ["AI" if p >= 0.5 else "Human" for p in probs_torch]
 
-df_sub2 = pd.DataFrame({
-    'text': texts,
-    'output': preds_torch_labels
-})
+df_sub2 = pd.DataFrame({'text': texts, 'output': preds_torch_labels})
 path_sub2 = os.path.join(OUTPUT_DIR, f"submissao1-grupo{GRUPO_NUMERO}-s2.csv")
 df_sub2.to_csv(path_sub2, index=False)
 print(f"Guardado com sucesso: {path_sub2}")
